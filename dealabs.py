@@ -3,6 +3,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # Configure Chrome options
 options = Options()
@@ -19,7 +22,17 @@ url = 'https://www.dealabs.com/'
 
 # Open the webpage
 driver.get(url)
-time.sleep(20)  # Add a delay to ensure the page is fully loaded
+
+# Showing some data requires dealing with cookies, so the code below refuse cookies to hide that div
+try:
+    cookie_button = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//button[@data-t='continueWithoutAcceptingBtn']")))
+    cookie_button.click()
+except:
+    pass
+
+# Wait for the offers to load
+wait = WebDriverWait(driver, 10)
+wait.until(EC.visibility_of_element_located((By.XPATH, "//article[contains(@class, 'thread')]")))
 
 # Find all offer elements
 offer_elements = driver.find_elements("xpath", "//article[contains(@class, 'thread')]")
@@ -29,10 +42,8 @@ for offer_element in offer_elements:
     try:
         # Extract information
         title = offer_element.find_element("xpath", ".//strong[contains(@class, 'thread-title')]/a").get_attribute('title')
-        price_element = offer_element.find_element("xpath", ".//span[contains(@class, 'threadItemCard-price')]")
-        price = price_element.text if price_element.text else "Price not available"
-        company_name_element = offer_element.find_element("xpath", ".//button[@data-t='merchantLink']")
-        company_name = company_name_element.text.strip() if company_name_element.text else "Company name not available"
+        price = offer_element.find_element("xpath", ".//span[contains(@class, 'threadItemCard-price')]").text
+        company_name = offer_element.find_element("xpath", ".//button[@data-t='merchantLink']").text.strip()
 
         # Print extracted information
         print(f"Title: {title}")
