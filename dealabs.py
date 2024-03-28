@@ -77,6 +77,7 @@ try:
                 data = (title, price, company_name)
                 cursor.execute(insert_query, data)
                 connection.commit()
+                print(f"Title: {title} - Price: {price} - Company: {company_name}")
 
             except Exception as e:
                 pass
