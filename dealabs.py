@@ -8,6 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from statistics import mean, median
 
 # Configure Chrome options
 options = Options()
@@ -81,6 +82,34 @@ try:
 
             except Exception as e:
                 pass
+        # Execute SQL query to select all prices from the 'offers' table
+    cursor.execute("SELECT price FROM offers")
+
+    # Fetch all the prices returned by the query
+    prices = cursor.fetchall()
+
+    # Extract numerical values from the prices
+    numeric_prices = []
+    for price in prices:
+        # Replace "Gratuit" with 0
+        if price[0].strip() == "GRATUIT":
+            numeric_prices.append(0)
+        else:
+            processed_price = price[0].replace('€', '').replace(',', '').replace(' ', '')
+            numeric_prices.append(float(processed_price))
+
+    # Calculate statistics
+    avg_price = mean(numeric_prices)
+    median_price = median(numeric_prices)
+    min_price = min(numeric_prices)
+    max_price = max(numeric_prices)
+
+    # Print the analysis results
+    print("Price Analysis:")
+    print(f"Average Price: {avg_price:.2f} €")
+    print(f"Median Price: {median_price:.2f} €")
+    print(f"Minimum Price: {min_price:.2f} €")
+    print(f"Maximum Price: {max_price:.2f} €")
 
 except Error as e:
     print("Error while connecting to MySQL", e)
