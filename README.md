@@ -9,4 +9,9 @@ This Python script demonstrates web scraping with Selenium from the Dealabs webs
 - Docker
 - Docker Compose
 # How To run
-
+- Run `docker-compose -up`
+- Check `localhost:8081` to enter into the phpMyAdmin interface
+- Check if there is a database called 'dealabs'
+- If it is not there, run this: `docker exec -it container_name bash`
+- While you are inside the container run `mysql -u root -p < /docker-entrypoint-initdb.d/init.sql`
+- Finally run the python script
